@@ -1,12 +1,8 @@
-// script.js - runs in the browser
-
-var socket = io();   // connect to the server
+var socket = io();   
 var video = document.getElementById('video');
-var playlist = [];   // list of movie numbers
+var playlist = [];   
 
-// IMPORTANT: when the SERVER changes our video, the video fires play/pause/seeked
-// events too. If we sent those to the server again we would get an endless loop.
-// So we set ignore = true while applying a change from the server.
+
 var ignore = false;
 
 var base = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/';
@@ -18,13 +14,11 @@ var movies = [
   { title: 'For Bigger Blazes', category: 'Action', url: base + 'ForBiggerBlazes.mp4' },
   { title: 'For Bigger Escapes', category: 'Action', url: base + 'ForBiggerEscapes.mp4' }
 ];
-
-// short name so we don't write document.getElementById every time
 function $(id) {
   return document.getElementById(id);
 }
 
-// run a change that came from the server (turns ignore on, then off after 0.5 sec)
+
 function applyFromServer(change) {
   ignore = true;
   change();
@@ -32,10 +26,6 @@ function applyFromServer(change) {
     ignore = false;
   }, 500);
 }
-
-// ================= HOME SCREEN =================
-
-// if the invite link has ?room=ABCDE, fill in the code box
 var params = new URLSearchParams(window.location.search);
 if (params.get('room') != null) {
   $('codeInput').value = params.get('room');
@@ -52,8 +42,6 @@ $('joinBtn').onclick = function() {
 socket.on('error-msg', function(message) {
   $('errorText').innerText = message;
 });
-
-// the server says we are in the room
 socket.on('joined', function(data) {
   $('home').style.display = 'none';
   $('room').style.display = 'block';
@@ -66,12 +54,9 @@ socket.on('joined', function(data) {
   if (data.poll != null) {
     showPoll(data.poll);
   }
-
-  // late join: jump to the current time (and play if the room is playing)
   applyFromServer(function() {
     video.currentTime = data.time;
     if (data.playing == true) {
-      // .catch is needed because browsers can block autoplay
       video.play().catch(function() {});
     }
   });
@@ -82,10 +67,6 @@ $('copyBtn').onclick = function() {
   navigator.clipboard.writeText(link);
   alert('Copied: ' + link);
 };
-
-// ================= VIDEO SYNC =================
-
-// when I use the video controls, tell the server (unless it came from the server)
 video.onplay = function() {
   if (ignore == false) {
     socket.emit('play', video.currentTime);
@@ -103,8 +84,6 @@ video.onseeked = function() {
     socket.emit('seek', video.currentTime);
   }
 };
-
-// when the server tells me someone else did something
 socket.on('play', function(time) {
   applyFromServer(function() {
     video.currentTime = time;
@@ -130,9 +109,6 @@ socket.on('change-video', function(url) {
     video.src = url;
   });
 });
-
-// ================= DRIFT CHECK =================
-// every 3 seconds ask the server what the time should be
 setInterval(function() {
   if ($('room').style.display == 'block') {
     socket.emit('get-time');
@@ -141,15 +117,12 @@ setInterval(function() {
 
 socket.on('server-time', function(data) {
   var difference = Math.abs(video.currentTime - data.time);
-  // only fix it if the video is playing and we are more than 0.5 sec away
   if (data.playing == true && difference > 0.5) {
     applyFromServer(function() {
       video.currentTime = data.time;
     });
   }
 });
-
-// ================= MOVIES (category filter + search) =================
 function showMovies() {
   var category = $('categorySelect').value;
   var search = $('searchInput').value.toLowerCase();
@@ -179,11 +152,11 @@ function addMovie(number) {
   socket.emit('add-playlist', number);
 }
 
-// redo the list every time the search box or category changes
+
 $('searchInput').oninput = showMovies;
 $('categorySelect').onchange = showMovies;
 
-// ================= USERS + HOST TRANSFER =================
+
 socket.on('users', function(list) {
   // am I the host?
   var iAmHost = false;
@@ -199,7 +172,7 @@ socket.on('users', function(list) {
     if (list[j].isHost == true) {
       html = html + ' (host)';
     }
-    // only the host sees the "Make host" buttons
+    
     if (iAmHost == true && list[j].id != socket.id) {
       html = html + ' <button onclick="makeHost(\'' + list[j].id + '\')">Make host</button>';
     }
@@ -212,7 +185,7 @@ function makeHost(id) {
   socket.emit('transfer-host', id);
 }
 
-// ================= CHAT =================
+
 function sendChat() {
   socket.emit('chat', $('chatInput').value);
   $('chatInput').value = '';
@@ -225,7 +198,7 @@ socket.on('chat', function(data) {
   $('chatBox').scrollTop = $('chatBox').scrollHeight;   // scroll to the newest message
 });
 
-// ================= EMOJI REACTIONS =================
+
 var emojiButtons = document.getElementsByClassName('emoji');
 for (var i = 0; i < emojiButtons.length; i++) {
   emojiButtons[i].onclick = function() {
@@ -240,7 +213,7 @@ socket.on('reaction', function(emoji) {
   }, 2000);
 });
 
-// ================= PLAYLIST =================
+
 socket.on('playlist', function(list) {
   playlist = list;
   showPlaylist();
@@ -254,7 +227,7 @@ function showPlaylist() {
   $('playlist').innerHTML = html;
 }
 
-// ================= POLL =================
+
 $('pollBtn').onclick = function() {
   if (playlist.length < 2) {
     alert('Add at least 2 movies to the playlist first');
