@@ -1,7 +1,7 @@
 {
   "name": "watch-party",
   "version": "1.0.0",
-  "description": "simple watch party project",
+  "description": " watch party ",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
