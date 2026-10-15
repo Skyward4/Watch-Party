@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Watch Party</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>🎬 Watch Party</h1>
+
+  <!-- first screen: create or join -->
+  <div id="home">
+    <p>Your name:</p>
+    <input type="text" id="nameInput" placeholder="Enter name">
+    <br><br>
+    <button id="createBtn">Create Room</button>
+    <br><br>
+    <input type="text" id="codeInput" placeholder="Room code">
+    <button id="joinBtn">Join Room</button>
+    <p id="errorText" class="error"></p>
+  </div>
+
+  <!-- second screen: the room -->
+  <div id="room" style="display:none;">
+    <p>
+      Room code: <b id="roomCode"></b>
+      <button id="copyBtn">Copy invite link</button>
+    </p>
+
+    <div class="container">
+      <div class="left">
+        <video id="video" width="600" controls></video>
+
+        <div class="reactions">
+          <button class="emoji">😂</button>
+          <button class="emoji">😍</button>
+          <button class="emoji">😮</button>
+          <button class="emoji">👏</button>
+          <button class="emoji">😢</button>
+        </div>
+        <div id="floating"></div>
+
+        <h3>Movies</h3>
+        <input type="text" id="searchInput" placeholder="Search movies...">
+        <select id="categorySelect">
+          <option value="All">All</option>
+          <option value="Animation">Animation</option>
+          <option value="Action">Action</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Fantasy">Fantasy</option>
+        </select>
+        <div id="movieList"></div>
+      </div>
+
+      <div class="right">
+        <h3>Users</h3>
+        <ul id="userList"></ul>
+
+        <h3>Chat</h3>
+        <div id="chatBox"></div>
+        <input type="text" id="chatInput" placeholder="Type message...">
+        <button id="sendBtn">Send</button>
+
+        <h3>Playlist</h3>
+        <ul id="playlist"></ul>
+
+        <h3>Poll</h3>
+        <button id="pollBtn">Start poll (from playlist)</button>
+        <div id="pollBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+body {
+  font-family: Arial;
+  background-color: #222;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.right {
+  text-align: left;
+  width: 300px;
+}
+
+#chatBox {
+  height: 150px;
+  overflow-y: scroll;
+  background-color: black;
+}
+
+.movie {
+  display: inline-block;
+  width: 170px;
+  margin: 5px;
+}
